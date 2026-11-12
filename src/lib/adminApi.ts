@@ -34,16 +34,20 @@ async function callAdmin<T>(
     body: options?.body ? JSON.stringify(options.body) : undefined,
   })
 
-  const contentType = res.headers.get('content-type') || ''
-  if (!contentType.includes('application/json')) {
+  const raw = await res.text()
+  let payload: { error?: string; errorMessage?: string; users?: unknown; user?: unknown; ok?: boolean } = {}
+  try {
+    payload = raw ? JSON.parse(raw) : {}
+  } catch {
     throw new Error(
-      'La función admin no está disponible aquí. En local usa `netlify dev`, o prueba en Netlify con SUPABASE_SERVICE_ROLE_KEY.',
+      res.status === 404
+        ? 'Function admin no desplegada. Sube el código y haz Redeploy en Netlify.'
+        : `Function admin falló (${res.status}). Revisa el deploy y SUPABASE_SERVICE_ROLE_KEY.`,
     )
   }
 
-  const payload = await res.json().catch(() => ({}))
   if (!res.ok) {
-    throw new Error(payload.error || `Error ${res.status}`)
+    throw new Error(payload.error || payload.errorMessage || `Error ${res.status}`)
   }
   return payload as T
 }

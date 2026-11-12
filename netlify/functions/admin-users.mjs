@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
+import ws from 'ws'
 
 const AUTH_EMAIL_DOMAIN = 'musclelab.local'
 
@@ -31,10 +32,24 @@ function getEnv() {
     process.env.SUPABASE_ANON_KEY ||
     process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
     process.env.VITE_SUPABASE_ANON_KEY
-  const service =
-    process.env.SUPABASE_SERVICE_ROLE_KEY ||
-    process.env.SUPABASE_SECRET_KEY
+  const service = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY
   return { url, anon, service }
+}
+
+function makeClient(url, key, extraHeaders = {}) {
+  return createClient(url, key, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+      detectSessionInUrl: false,
+    },
+    global: {
+      headers: extraHeaders,
+    },
+    realtime: {
+      transport: ws,
+    },
+  })
 }
 
 async function requireAdmin(event) {
@@ -43,7 +58,7 @@ async function requireAdmin(event) {
     return {
       error: json(500, {
         error:
-          'Faltan variables SUPABASE_URL, VITE_SUPABASE_PUBLISHABLE_KEY y SUPABASE_SERVICE_ROLE_KEY en Netlify',
+          'Faltan variables SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY (o VITE_*) y SUPABASE_SERVICE_ROLE_KEY en Netlify',
       }),
     }
   }
@@ -54,20 +69,16 @@ async function requireAdmin(event) {
     return { error: json(401, { error: 'No autorizado' }) }
   }
 
-  const userClient = createClient(url, anon, {
-    global: { headers: { Authorization: `Bearer ${token}` } },
-  })
+  const userClient = makeClient(url, anon, { Authorization: `Bearer ${token}` })
   const {
     data: { user },
     error: userError,
-  } = await userClient.auth.getUser()
+  } = await userClient.auth.getUser(token)
   if (userError || !user) {
     return { error: json(401, { error: 'Sesión inválida' }) }
   }
 
-  const adminClient = createClient(url, service, {
-    auth: { autoRefreshToken: false, persistSession: false },
-  })
+  const adminClient = makeClient(url, service)
 
   const { data: profile, error: profileError } = await adminClient
     .from('profiles')
