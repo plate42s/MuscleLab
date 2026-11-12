@@ -1,6 +1,7 @@
 import { NavLink, Outlet } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 
-const navItems = [
+const baseNav = [
   { to: '/', label: 'Hoy', end: true },
   { to: '/entrenar', label: 'Entrenar' },
   { to: '/progreso', label: 'Progreso' },
@@ -10,6 +11,17 @@ const navItems = [
 ]
 
 export function Layout() {
+  const { profile } = useAuth()
+  const isAdmin = profile?.role === 'admin'
+
+  const navItems = isAdmin
+    ? [
+        ...baseNav.slice(0, 5),
+        { to: '/usuarios', label: 'Usuarios', end: false },
+        baseNav[5],
+      ]
+    : baseNav
+
   return (
     <div className="ml-shell mx-auto flex min-h-screen w-full max-w-6xl flex-col md:flex-row">
       <aside className="ml-aside hidden p-6 md:flex md:w-60 md:flex-col md:gap-6">
@@ -67,7 +79,10 @@ export function Layout() {
       </div>
 
       <nav className="ml-bottom-nav fixed inset-x-0 bottom-0 z-20 px-2 py-2 md:hidden">
-        <div className="mx-auto grid max-w-lg grid-cols-6 gap-1">
+        <div
+          className="mx-auto grid max-w-lg gap-1"
+          style={{ gridTemplateColumns: `repeat(${navItems.length}, minmax(0, 1fr))` }}
+        >
           {navItems.map((item) => (
             <NavLink
               key={item.to}
@@ -75,7 +90,7 @@ export function Layout() {
               end={item.end}
               className={({ isActive }) =>
                 [
-                  'rounded-lg px-1 py-2 text-center text-[11px] font-semibold transition',
+                  'rounded-lg px-1 py-2 text-center text-[10px] font-semibold transition sm:text-[11px]',
                   isActive ? 'ml-nav-mobile-active' : 'ml-nav-idle',
                 ].join(' ')
               }

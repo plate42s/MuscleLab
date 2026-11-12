@@ -1,7 +1,9 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { AdminRoute } from './components/AdminRoute'
 import { Layout } from './components/Layout'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { AuthProvider } from './context/AuthContext'
+import { AdminUsers } from './pages/AdminUsers'
 import { Food } from './pages/Food'
 import { Login } from './pages/Login'
 import { Placeholder } from './pages/Placeholder'
@@ -38,6 +40,9 @@ export default function App() {
                 }
               />
               <Route path="perfil" element={<Profile />} />
+              <Route element={<AdminRoute />}>
+                <Route path="usuarios" element={<AdminUsers />} />
+              </Route>
             </Route>
           </Route>
 

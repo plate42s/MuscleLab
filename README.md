@@ -51,9 +51,17 @@ npm run dev
 4. **Environment variables** (Site settings → Environment variables):
    - `VITE_SUPABASE_URL`
    - `VITE_SUPABASE_PUBLISHABLE_KEY`
+   - `SUPABASE_URL` (misma URL; usada por Functions)
+   - `SUPABASE_SERVICE_ROLE_KEY` (**secret**, nunca en el front)
 5. Deploy. Las rutas SPA ya redirigen a `index.html`.
 
 > Las variables `VITE_*` se incrustan en el build: si las cambias, hay que **Redeploy**.
+
+## Admin · CRUD usuarios
+
+- Menú **Usuarios** solo si `profiles.role = admin`
+- Crear / editar / eliminar vía Netlify Function `admin-users`
+- Ejecuta también: `supabase/migrations/006_admin_profiles_rls.sql`
 
 ## Próximo
 
