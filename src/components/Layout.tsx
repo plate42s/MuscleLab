@@ -89,7 +89,7 @@ export function Layout() {
   const isAdmin = profile?.role === 'admin'
   const section = resolveSection(location.pathname)
 
-  const desktopNav = isAdmin
+  const desktopNav: NavItem[] = isAdmin
     ? [
         ...baseNav.slice(0, 5),
         { to: '/usuarios', label: 'Usuarios', Icon: IconUsuarios },
