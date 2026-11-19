@@ -62,9 +62,9 @@ export function ExercisePicker({ open, onClose, onSelect }: ExercisePickerProps)
 
   return (
     <div className="fixed inset-0 z-40 flex items-end justify-center bg-black/40 p-0 md:items-center md:p-4">
-      <div className="flex max-h-[90vh] w-full max-w-lg flex-col rounded-t-3xl bg-white p-4 shadow-xl md:rounded-3xl">
+      <div className="flex max-h-[90vh] w-full max-w-lg flex-col rounded-t-3xl bg-[var(--ml-surface)] p-4 shadow-xl md:rounded-3xl">
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="font-display text-xl font-bold">Añadir ejercicio</h2>
+          <h2 className="font-display text-xl font-bold ml-title">Añadir ejercicio</h2>
           <button className="btn-secondary !px-3 !py-2" type="button" onClick={onClose}>
             Cerrar
           </button>
@@ -77,22 +77,34 @@ export function ExercisePicker({ open, onClose, onSelect }: ExercisePickerProps)
           onChange={(e) => setQuery(e.target.value)}
         />
 
-        <div className="mb-3 flex gap-2 overflow-x-auto pb-1">
-          {modalities.map((item) => (
-            <button
-              key={item}
-              type="button"
-              className={[
-                'whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold',
-                modality === item
-                  ? 'bg-crimson text-cream-mist'
-                  : 'bg-cream-oat text-ink-700',
-              ].join(' ')}
-              onClick={() => setModality(item)}
-            >
-              {item}
-            </button>
-          ))}
+        <div className="mb-3 flex flex-wrap gap-2">
+          {modalities.map((item) => {
+            const selected = modality === item
+            return (
+              <button
+                key={item}
+                type="button"
+                aria-pressed={selected}
+                className="whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold capitalize transition"
+                style={
+                  selected
+                    ? {
+                        background: 'var(--ml-primary)',
+                        color: '#111315',
+                        boxShadow: '0 0 0 1px var(--ml-primary)',
+                      }
+                    : {
+                        background: 'var(--ml-elevated)',
+                        color: 'var(--ml-text-muted)',
+                        boxShadow: 'inset 0 0 0 1px var(--ml-border)',
+                      }
+                }
+                onClick={() => setModality(item)}
+              >
+                {item}
+              </button>
+            )
+          })}
         </div>
 
         <select
@@ -109,7 +121,7 @@ export function ExercisePicker({ open, onClose, onSelect }: ExercisePickerProps)
 
         <div className="min-h-0 flex-1 space-y-2 overflow-y-auto">
           {loading && <p className="text-sm ml-muted">Cargando catálogo…</p>}
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <p className="text-sm text-danger">{error}</p>}
           {!loading && filtered.length === 0 && (
             <p className="text-sm ml-muted">No hay ejercicios con esos filtros.</p>
           )}
@@ -117,7 +129,7 @@ export function ExercisePicker({ open, onClose, onSelect }: ExercisePickerProps)
             <button
               key={exercise.id}
               type="button"
-              className="flex w-full items-center justify-between rounded-xl border border-cream-oat px-3 py-3 text-left hover:bg-gold-soft/50"
+              className="flex w-full items-center justify-between rounded-xl border border-[var(--ml-border)] bg-[var(--ml-elevated)] px-3 py-3 text-left hover:border-[var(--ml-primary)]"
               onClick={() => {
                 onSelect(exercise)
                 onClose()
@@ -129,7 +141,7 @@ export function ExercisePicker({ open, onClose, onSelect }: ExercisePickerProps)
                   {exercise.modality} · {exercise.muscle_group} · {exercise.load_type}
                 </span>
               </span>
-              <span className="text-accent-dark">+</span>
+              <span className="text-primary">+</span>
             </button>
           ))}
         </div>

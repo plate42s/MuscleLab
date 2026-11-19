@@ -149,3 +149,19 @@ export function weightSeries(
       value: Number(m.weight_kg),
     }))
 }
+
+export function bodyFatSeries(
+  metrics: Array<{ recorded_at: string; body_fat_pct: number | null }>,
+): Array<{ label: string; value: number }> {
+  return metrics
+    .filter((m) => m.body_fat_pct != null)
+    .slice()
+    .reverse()
+    .map((m) => ({
+      label: new Date(m.recorded_at).toLocaleDateString('es-MX', {
+        day: '2-digit',
+        month: 'short',
+      }),
+      value: Number(m.body_fat_pct),
+    }))
+}

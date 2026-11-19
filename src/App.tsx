@@ -6,7 +6,7 @@ import { AuthProvider } from './context/AuthContext'
 import { AdminUsers } from './pages/AdminUsers'
 import { Food } from './pages/Food'
 import { Login } from './pages/Login'
-import { Placeholder } from './pages/Placeholder'
+import { Coach } from './pages/Coach'
 import { Profile } from './pages/Profile'
 import { Progress } from './pages/Progress'
 import { Setup } from './pages/Setup'
@@ -30,15 +30,7 @@ export default function App() {
               <Route path="progreso" element={<Progress />} />
               <Route path="progreso/:id" element={<WorkoutDetail />} />
               <Route path="comida" element={<Food />} />
-              <Route
-                path="coach"
-                element={
-                  <Placeholder
-                    title="Coach IA"
-                    blurb="Ajuste de sesión y rutina base llegarán en F4."
-                  />
-                }
-              />
+              <Route path="coach" element={<Coach />} />
               <Route path="perfil" element={<Profile />} />
               <Route element={<AdminRoute />}>
                 <Route path="usuarios" element={<AdminUsers />} />

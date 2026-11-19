@@ -3,32 +3,74 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: light;
-  --ml-crimson: #a62c39;
-  --ml-brick: #9b2330;
-  --ml-deep: #70151e;
-  --ml-oat: #e3d9c9;
-  --ml-rose: #bc8e8e;
-  --ml-cream: #ede2d2;
-  --ml-sand: #e6dec9;
-  --ml-mist: #f4f4f6;
-  --ml-gold: #c4a35a;
-  --ml-gold-dark: #9a7b3c;
-  --ml-gold-soft: #f0e6c8;
-  --ml-gold-line: #d4bc7d;
-  --ml-ink: #3b1a1f;
-  --ml-ink-soft: #5c3a3f;
+  color-scheme: dark;
+
+  /* Fondos y superficies */
+  --ml-bg: #111315;
+  --ml-surface: #191c20;
+  --ml-elevated: #22272d;
+  --ml-border: #30363d;
+
+  /* Identidad */
+  --ml-primary: #f07835;
+  --ml-primary-hover: #e56828;
+  --ml-text: #f3f4f0;
+  --ml-text-muted: #a3abb4;
+
+  /* Estados */
+  --ml-success: #35b879;
+  --ml-warning: #e3b341;
+  --ml-danger: #e05b5b;
+  --ml-info: #56a6d9;
+
+  /* Hitos especiales (no funcional v1) */
+  --ml-milestone: #c4a35a;
+
+  /* aliases compatibles con clases existentes */
+  --ml-ink: var(--ml-text);
+  --ml-ink-soft: var(--ml-text-muted);
+  --ml-deep: var(--ml-text);
+  --ml-crimson: var(--ml-primary);
+  --ml-brick: var(--ml-primary-hover);
+  --ml-gold: var(--ml-primary);
+  --ml-gold-dark: var(--ml-primary-hover);
+  --ml-gold-soft: var(--ml-elevated);
+  --ml-gold-line: var(--ml-border);
+  --ml-oat: var(--ml-border);
+  --ml-cream: var(--ml-elevated);
+  --ml-rose: var(--ml-text-muted);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--ml-border) var(--ml-bg);
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--ml-bg);
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--ml-border);
+  border-radius: 999px;
+  border: 2px solid var(--ml-bg);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--ml-primary);
 }
 
 body {
   margin: 0;
   min-height: 100vh;
   font-family: 'DM Sans', system-ui, sans-serif;
-  background:
-    radial-gradient(ellipse 80% 50% at 100% 0%, rgba(196, 163, 90, 0.28) 0%, transparent 55%),
-    radial-gradient(ellipse 70% 45% at 0% 0%, rgba(166, 44, 57, 0.2) 0%, transparent 50%),
-    linear-gradient(165deg, #f4f4f6 0%, #ede2d2 40%, #e3d9c9 100%);
-  color: var(--ml-ink);
+  background: var(--ml-bg);
+  color: var(--ml-text);
 }
 
 #root {
@@ -38,151 +80,178 @@ body {
 @layer components {
   .btn-primary {
     @apply inline-flex items-center justify-center rounded-xl px-4 py-3 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50;
-    background: linear-gradient(135deg, var(--ml-crimson) 0%, var(--ml-brick) 100%);
-    color: #fff;
-    box-shadow: 0 8px 18px -10px rgba(112, 21, 30, 0.7);
+    background-color: var(--ml-primary);
+    color: #111315;
+    box-shadow: 0 8px 18px -10px rgba(240, 120, 53, 0.55);
   }
 
   .btn-primary:hover:not(:disabled) {
-    background: linear-gradient(135deg, var(--ml-brick) 0%, var(--ml-deep) 100%);
+    background-color: var(--ml-primary-hover);
   }
 
   .btn-secondary {
     @apply inline-flex items-center justify-center rounded-xl px-4 py-3 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50;
-    border: 1px solid var(--ml-gold-line);
-    background-color: var(--ml-cream);
-    color: var(--ml-deep);
+    border: 1px solid var(--ml-border);
+    background-color: var(--ml-elevated);
+    color: var(--ml-text);
   }
 
   .btn-secondary:hover:not(:disabled) {
-    background-color: var(--ml-gold-soft);
-    border-color: var(--ml-gold);
+    border-color: var(--ml-primary);
+    color: var(--ml-primary);
   }
 
   .btn-gold {
     @apply inline-flex items-center justify-center rounded-xl px-4 py-3 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50;
-    background: linear-gradient(135deg, var(--ml-gold) 0%, var(--ml-gold-dark) 100%);
-    color: var(--ml-deep);
+    background-color: var(--ml-elevated);
+    border: 1px solid var(--ml-primary);
+    color: var(--ml-primary);
   }
 
   .btn-gold:hover:not(:disabled) {
-    color: #fff;
+    background-color: var(--ml-primary);
+    color: #111315;
   }
 
   .input-field {
     @apply w-full rounded-xl px-3 py-2.5 text-sm outline-none;
-    border: 1px solid var(--ml-oat);
-    background-color: #fff;
-    color: var(--ml-ink);
+    border: 1px solid var(--ml-border);
+    background-color: var(--ml-elevated);
+    color: var(--ml-text);
+  }
+
+  .input-field::placeholder {
+    color: var(--ml-text-muted);
   }
 
   .input-field:focus {
-    border-color: var(--ml-gold);
-    box-shadow: 0 0 0 3px rgba(196, 163, 90, 0.28);
+    border-color: var(--ml-primary);
+    box-shadow: 0 0 0 3px rgba(240, 120, 53, 0.25);
   }
 
   .card {
     @apply rounded-2xl p-4;
-    border: 1px solid var(--ml-oat);
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(237, 226, 210, 0.88) 100%);
-    box-shadow: 0 12px 28px -20px rgba(112, 21, 30, 0.45);
+    border: 1px solid var(--ml-border);
+    background-color: var(--ml-surface);
+    box-shadow: 0 12px 28px -18px rgba(0, 0, 0, 0.55);
   }
 
   .card-accent {
-    border-left: 4px solid var(--ml-gold);
+    border-left: 4px solid var(--ml-primary);
   }
 
   .ml-shell {
-    background: rgba(237, 226, 210, 0.55);
+    background: var(--ml-bg);
   }
 
   .ml-aside {
-    background: linear-gradient(180deg, #f4f4f6 0%, #ede2d2 55%, #e3d9c9 100%);
-    border-right: 1px solid var(--ml-gold-line);
+    width: 240px;
+    border: 1px solid var(--ml-border);
+    border-radius: 1.25rem;
+    background-color: var(--ml-surface);
+    box-shadow: 0 12px 28px -18px rgba(0, 0, 0, 0.55);
+  }
+
+  .ml-stat-card {
+    @apply rounded-2xl p-4;
+    border: 1px solid var(--ml-border);
+    background-color: var(--ml-elevated);
   }
 
   .ml-header {
-    background: rgba(244, 244, 246, 0.88);
-    border-bottom: 1px solid var(--ml-gold-line);
-    backdrop-filter: blur(8px);
+    border: 1px solid var(--ml-border);
+    border-radius: 1.25rem;
+    background-color: rgba(25, 28, 32, 0.96);
+    box-shadow: 0 12px 28px -18px rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(10px);
   }
 
   .ml-bottom-nav {
-    background: rgba(244, 244, 246, 0.96);
-    border-top: 1px solid var(--ml-gold-line);
+    border: 1px solid var(--ml-border);
+    border-radius: 1.25rem;
+    background-color: rgba(25, 28, 32, 0.96);
+    box-shadow: 0 12px 28px -18px rgba(0, 0, 0, 0.55);
     backdrop-filter: blur(10px);
   }
 
   .ml-nav-active {
-    background: linear-gradient(135deg, var(--ml-crimson), var(--ml-brick));
-    color: #fff;
-    box-shadow: 0 6px 14px -8px rgba(112, 21, 30, 0.8);
+    background-color: var(--ml-elevated);
+    color: var(--ml-primary);
   }
 
   .ml-nav-idle {
-    color: var(--ml-ink-soft);
+    color: var(--ml-text);
   }
 
   .ml-nav-idle:hover {
-    background-color: var(--ml-gold-soft);
-    color: var(--ml-deep);
+    background-color: var(--ml-elevated);
+    color: var(--ml-primary);
   }
 
   .ml-nav-mobile-active {
-    background-color: var(--ml-gold-soft);
-    color: var(--ml-deep);
-    box-shadow: inset 0 -2px 0 var(--ml-gold);
+    background-color: var(--ml-elevated);
+    color: var(--ml-primary);
+    box-shadow: inset 0 -2px 0 var(--ml-primary);
   }
 
   .ml-title {
-    color: var(--ml-deep);
+    color: var(--ml-text);
   }
 
   .ml-muted {
-    color: var(--ml-rose);
+    color: var(--ml-text-muted);
   }
 
   .ml-brand-bar {
     height: 4px;
     width: 4.5rem;
     border-radius: 999px;
-    background: linear-gradient(90deg, var(--ml-crimson), var(--ml-gold), var(--ml-cream));
+    background: linear-gradient(90deg, var(--ml-primary), var(--ml-primary-hover));
   }
 
   .table-ml {
     @apply w-full overflow-hidden rounded-2xl text-left text-sm;
-    border: 1px solid var(--ml-gold-line);
-    background-color: #fff;
+    border: 1px solid var(--ml-border);
+    background-color: var(--ml-surface);
   }
 
   .table-ml thead {
-    background: linear-gradient(90deg, var(--ml-deep), var(--ml-brick));
-    color: #fff;
+    background-color: var(--ml-elevated);
+    color: var(--ml-text);
   }
 
   .table-ml th {
     @apply px-3 py-2.5 font-semibold tracking-wide;
-    border-bottom: 2px solid var(--ml-gold);
+    border-bottom: 2px solid var(--ml-primary);
   }
 
   .table-ml td {
     @apply px-3 py-2.5;
-    border-bottom: 1px solid var(--ml-oat);
-    color: var(--ml-ink);
+    border-bottom: 1px solid var(--ml-border);
+    color: var(--ml-text);
   }
 
   .table-ml tbody tr:nth-child(even) {
-    background-color: var(--ml-cream);
+    background-color: rgba(34, 39, 45, 0.55);
   }
 
   .table-ml tbody tr:hover {
-    background-color: var(--ml-gold-soft);
+    background-color: rgba(240, 120, 53, 0.12);
   }
 
-  .badge-gold {
+  .badge-gold,
+  .badge-accent {
     @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold;
-    border: 1px solid var(--ml-gold);
-    background: linear-gradient(180deg, #fff8e8, var(--ml-gold-soft));
-    color: var(--ml-gold-dark);
+    border: 1px solid rgba(240, 120, 53, 0.45);
+    background-color: rgba(240, 120, 53, 0.14);
+    color: var(--ml-primary);
+  }
+
+  .text-danger {
+    color: var(--ml-danger);
+  }
+
+  .text-success {
+    color: var(--ml-success);
   }
 }

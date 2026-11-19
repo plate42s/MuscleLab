@@ -127,8 +127,8 @@ export function AdminUsers() {
         <p className="text-sm ml-muted">CRUD solo para administradores</p>
       </div>
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
-      {message && <p className="text-sm" style={{ color: 'var(--ml-brick)' }}>{message}</p>}
+      {error && <p className="text-sm text-danger">{error}</p>}
+      {message && <p className="text-sm" style={{ color: 'var(--ml-success)' }}>{message}</p>}
 
       <div className="card text-sm ml-muted">
         En <strong>local (`npm run dev`)</strong> puedes listar usuarios. Crear/editar contraseña/eliminar
@@ -271,7 +271,7 @@ export function AdminUsers() {
                         <button
                           type="button"
                           className="text-xs font-semibold"
-                          style={{ color: 'var(--ml-gold-dark)' }}
+                          style={{ color: 'var(--ml-primary)' }}
                           onClick={() => startEdit(row)}
                         >
                           Editar
@@ -279,7 +279,7 @@ export function AdminUsers() {
                         <button
                           type="button"
                           className="text-xs font-semibold"
-                          style={{ color: 'var(--ml-crimson)' }}
+                          style={{ color: 'var(--ml-danger)' }}
                           onClick={() => void onDelete(row)}
                           disabled={row.id === user?.id}
                         >

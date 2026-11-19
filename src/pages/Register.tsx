@@ -34,8 +34,8 @@ export function Register() {
     <div className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-4">
       <div className="card space-y-5">
         <div>
-          <h1 className="font-display text-3xl font-bold text-crimson-deep">Crear cuenta</h1>
-          <p className="mt-1 text-sm text-ink-700">Grupo de prueba · español</p>
+          <h1 className="font-display text-3xl font-bold ml-title">Crear cuenta</h1>
+          <p className="mt-1 text-sm ml-muted">Grupo de prueba · español</p>
         </div>
         <form className="space-y-3" onSubmit={onSubmit}>
           <label className="block text-sm">
@@ -70,15 +70,15 @@ export function Register() {
               onChange={(e) => setPassword(e.target.value)}
             />
           </label>
-          {error && <p className="text-sm text-red-600">{error}</p>}
-          {info && <p className="text-sm text-accent-dark">{info}</p>}
+          {error && <p className="text-sm text-danger">{error}</p>}
+          {info && <p className="text-sm text-primary">{info}</p>}
           <button className="btn-primary w-full" type="submit" disabled={submitting}>
             {submitting ? 'Creando…' : 'Registrarme'}
           </button>
         </form>
-        <p className="text-center text-sm text-slate-600">
+        <p className="text-center text-sm ml-muted">
           ¿Ya tienes cuenta?{' '}
-          <Link className="font-semibold text-accent-dark" to="/login">
+          <Link className="font-semibold text-primary" to="/login">
             Entrar
           </Link>
         </p>

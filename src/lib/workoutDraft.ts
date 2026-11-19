@@ -12,6 +12,7 @@ export function createEmptySet(index: number): WorkoutSetDraft {
     weight_kg: '',
     duration_sec: '',
     rpe: '',
+    completed: false,
   }
 }
 
@@ -32,6 +33,11 @@ export function duplicateLastSet(sets: WorkoutSetDraft[]): WorkoutSetDraft[] {
       ...last,
       localId: uid(),
       set_index: sets.length + 1,
+      completed: false,
     },
   ]
+}
+
+export function reindexSets(sets: WorkoutSetDraft[]): WorkoutSetDraft[] {
+  return sets.map((set, index) => ({ ...set, set_index: index + 1 }))
 }

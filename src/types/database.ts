@@ -14,6 +14,7 @@ export interface Profile {
   level: Level | null
   modality: Modality | null
   weight_kg: number | null
+  body_fat_pct: number | null
   daily_kcal_target: number | null
   created_at: string
   updated_at: string
@@ -58,6 +59,8 @@ export interface WorkoutSetDraft {
   weight_kg: string
   duration_sec: string
   rpe: string
+  /** Estado local de la sesión activa (no se persiste en BD) */
+  completed: boolean
 }
 
 export interface WorkoutExerciseDraft {
@@ -76,6 +79,7 @@ export interface BodyMetric {
   user_id: string
   recorded_at: string
   weight_kg: number | null
+  body_fat_pct: number | null
   waist_cm: number | null
   chest_cm: number | null
   arm_cm: number | null

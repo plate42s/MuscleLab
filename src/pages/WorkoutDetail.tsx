@@ -92,7 +92,7 @@ export function WorkoutDetail() {
   if (!workout) {
     return (
       <div className="space-y-3">
-        <p className="text-sm text-red-600">{error ?? 'No encontrada'}</p>
+        <p className="text-sm text-danger">{error ?? 'No encontrada'}</p>
         <Link className="btn-secondary inline-flex" to="/progreso">
           Volver
         </Link>
@@ -104,7 +104,7 @@ export function WorkoutDetail() {
     <div className="mx-auto max-w-2xl space-y-4">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <Link to="/progreso" className="text-sm font-medium text-accent-dark">
+          <Link to="/progreso" className="text-sm font-medium text-primary">
             ← Historial
           </Link>
           <h1 className="mt-2 font-display text-2xl font-bold ml-title">{workout.title ?? 'Sesión'}</h1>
@@ -118,7 +118,7 @@ export function WorkoutDetail() {
       </div>
 
       {workout.notes && <div className="card text-sm ml-muted">{workout.notes}</div>}
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm text-danger">{error}</p>}
 
       <div className="space-y-3">
         {grouped.map((group) => (
@@ -138,7 +138,7 @@ export function WorkoutDetail() {
                 <tbody>
                   {group.sets.map((set) => (
                     <tr key={set.id}>
-                      <td className="font-semibold text-gold-dark">{set.set_index}</td>
+                      <td className="font-semibold text-primary">{set.set_index}</td>
                       <td>{set.reps ?? '—'}</td>
                       <td>{set.weight_kg != null ? `${set.weight_kg} kg` : '—'}</td>
                       <td>{set.duration_sec != null ? `${set.duration_sec}s` : '—'}</td>

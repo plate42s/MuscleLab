@@ -64,6 +64,20 @@ export function Food() {
   const progressPct =
     target && target > 0 ? Math.min(100, Math.round((totals.calories / target) * 100)) : 0
 
+  /** Barras relativas entre macros del día (sin objetivos por macro) */
+  const macroBars = useMemo(() => {
+    const rows = [
+      { key: 'protein', label: 'Proteína', grams: totals.protein_g },
+      { key: 'carbs', label: 'Carbs', grams: totals.carbs_g },
+      { key: 'fat', label: 'Grasa', grams: totals.fat_g },
+    ]
+    const max = Math.max(...rows.map((r) => r.grams), 1)
+    return rows.map((r) => ({
+      ...r,
+      pct: Math.round((r.grams / max) * 100),
+    }))
+  }, [totals])
+
   async function onSubmit(e: FormEvent) {
     e.preventDefault()
     if (!user) return
@@ -110,69 +124,92 @@ export function Food() {
 
   return (
     <div className="mx-auto max-w-xl space-y-4">
-      <div>
+      <div className="hidden md:block">
         <h1 className="font-display text-2xl font-bold ml-title">Comida</h1>
-        <p className="text-sm ml-muted">Calorías y macros básicos del día</p>
+        <p className="text-sm ml-muted">Panel de nutrición del día</p>
       </div>
 
-      <div className="card card-accent space-y-3">
-        <div className="flex items-start justify-between gap-2">
+      {/* Panel de nutrición */}
+      <section className="ml-stat-card space-y-4">
+        <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="text-xs ml-muted">Hoy</p>
-            <p className="font-display text-3xl font-bold ml-title">{totals.calories}</p>
-            <p className="text-xs ml-muted">
-              kcal{target != null ? ` / ${target} objetivo` : ''}
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] ml-muted">
+              Nutrición · Hoy
+            </p>
+            <p className="mt-1 font-display text-3xl font-bold tabular-nums ml-title">
+              {Math.round(totals.calories)}
+              <span className="ml-1 text-base font-semibold ml-muted">kcal</span>
+            </p>
+            <p className="mt-1 text-xs ml-muted">
+              {target != null ? `Objetivo ${target} kcal` : 'Sin objetivo de kcal'}
             </p>
           </div>
           {remaining != null && (
-            <span className="badge-gold">
+            <span className="badge-gold shrink-0">
               {remaining >= 0 ? `${remaining} restantes` : `${Math.abs(remaining)} sobre`}
             </span>
           )}
         </div>
 
-        {target != null && target > 0 && (
-          <div className="h-3 overflow-hidden rounded-full bg-[var(--ml-oat)]">
+        <div>
+          <div className="mb-1.5 flex items-center justify-between text-xs ml-muted">
+            <span>Calorías vs objetivo</span>
+            <span className="font-semibold ml-title">
+              {target != null && target > 0 ? `${progressPct}%` : '—'}
+            </span>
+          </div>
+          <div className="h-2.5 overflow-hidden rounded-full bg-[var(--ml-surface)]">
             <div
               className="h-full rounded-full transition-all"
               style={{
-                width: `${progressPct}%`,
+                width: `${target != null && target > 0 ? progressPct : 0}%`,
                 background:
                   progressPct > 100
-                    ? 'linear-gradient(90deg, var(--ml-brick), var(--ml-deep))'
-                    : 'linear-gradient(90deg, var(--ml-gold), var(--ml-crimson))',
+                    ? 'var(--ml-danger)'
+                    : 'linear-gradient(90deg, var(--ml-primary), var(--ml-primary-hover))',
               }}
             />
           </div>
-        )}
-
-        <div className="grid grid-cols-3 gap-2 text-center text-sm">
-          <div className="rounded-xl bg-white/70 p-2">
-            <p className="text-xs ml-muted">Proteína</p>
-            <p className="font-semibold ml-title">{Math.round(totals.protein_g)} g</p>
-          </div>
-          <div className="rounded-xl bg-white/70 p-2">
-            <p className="text-xs ml-muted">Carbs</p>
-            <p className="font-semibold ml-title">{Math.round(totals.carbs_g)} g</p>
-          </div>
-          <div className="rounded-xl bg-white/70 p-2">
-            <p className="text-xs ml-muted">Grasa</p>
-            <p className="font-semibold ml-title">{Math.round(totals.fat_g)} g</p>
-          </div>
+          {target == null && (
+            <p className="mt-2 text-xs ml-muted">
+              Define tu objetivo en{' '}
+              <Link
+                className="font-semibold underline"
+                style={{ color: 'var(--ml-primary)' }}
+                to="/perfil"
+              >
+                Perfil
+              </Link>
+            </p>
+          )}
         </div>
 
-        {target == null && (
-          <p className="text-xs ml-muted">
-            Define tu objetivo de kcal en{' '}
-            <Link className="font-semibold underline" style={{ color: 'var(--ml-gold-dark)' }} to="/perfil">
-              Perfil
-            </Link>
-            .
+        <div className="space-y-3 border-t border-[var(--ml-border)] pt-3">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] ml-muted">
+            Macros del día
           </p>
-        )}
-      </div>
+          {macroBars.map((macro) => (
+            <div key={macro.key}>
+              <div className="mb-1 flex items-center justify-between text-xs">
+                <span className="font-medium ml-title">{macro.label}</span>
+                <span className="tabular-nums ml-muted">{Math.round(macro.grams)} g</span>
+              </div>
+              <div className="h-2 overflow-hidden rounded-full bg-[var(--ml-surface)]">
+                <div
+                  className="h-full rounded-full transition-all"
+                  style={{
+                    width: `${Math.max(macro.grams > 0 ? 8 : 0, macro.pct)}%`,
+                    background: 'var(--ml-primary)',
+                    opacity: macro.key === 'protein' ? 1 : macro.key === 'carbs' ? 0.72 : 0.48,
+                  }}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
 
-      <form className="card card-accent space-y-3" onSubmit={onSubmit}>
+      <form className="card space-y-3" onSubmit={onSubmit}>
         <h2 className="font-semibold ml-title">Registrar comida</h2>
         <label className="block text-sm">
           <span className="mb-1 block font-medium">Qué comiste</span>
@@ -242,8 +279,8 @@ export function Food() {
           onChange={(e) => setNotes(e.target.value)}
         />
 
-        {error && <p className="text-sm text-red-600">{error}</p>}
-        {message && <p className="text-sm" style={{ color: 'var(--ml-brick)' }}>{message}</p>}
+        {error && <p className="text-sm text-danger">{error}</p>}
+        {message && <p className="text-sm" style={{ color: 'var(--ml-success)' }}>{message}</p>}
 
         <button className="btn-primary w-full" type="submit" disabled={saving}>
           {saving ? 'Guardando…' : 'Añadir comida'}
@@ -276,7 +313,7 @@ export function Food() {
             <button
               type="button"
               className="text-xs font-semibold"
-              style={{ color: 'var(--ml-crimson)' }}
+              style={{ color: 'var(--ml-danger)' }}
               onClick={() => void removeLog(log.id)}
             >
               Eliminar

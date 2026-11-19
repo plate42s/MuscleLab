@@ -14,6 +14,7 @@ export function BodyMetricsPanel({
   onChanged: () => Promise<void> | void
 }) {
   const [weightKg, setWeightKg] = useState('')
+  const [bodyFatPct, setBodyFatPct] = useState('')
   const [waistCm, setWaistCm] = useState('')
   const [chestCm, setChestCm] = useState('')
   const [armCm, setArmCm] = useState('')
@@ -34,6 +35,7 @@ export function BodyMetricsPanel({
     const { error: insertError } = await supabase.from('body_metrics').insert({
       user_id: userId,
       weight_kg: weightKg ? Number(weightKg) : null,
+      body_fat_pct: bodyFatPct ? Number(bodyFatPct) : null,
       waist_cm: waistCm ? Number(waistCm) : null,
       chest_cm: chestCm ? Number(chestCm) : null,
       arm_cm: armCm ? Number(armCm) : null,
@@ -52,6 +54,7 @@ export function BodyMetricsPanel({
     }
 
     setWeightKg('')
+    setBodyFatPct('')
     setWaistCm('')
     setChestCm('')
     setArmCm('')
@@ -73,20 +76,26 @@ export function BodyMetricsPanel({
       </div>
 
       {latest && (
-        <div className="grid grid-cols-2 gap-2 text-sm sm:grid-cols-4">
-          <div className="rounded-xl bg-white/70 p-2">
+        <div className="grid grid-cols-2 gap-2 text-sm sm:grid-cols-3">
+          <div className="rounded-xl bg-[var(--ml-elevated)] p-2">
             <p className="text-xs ml-muted">Peso</p>
             <p className="font-semibold ml-title">{latest.weight_kg ?? '—'} kg</p>
           </div>
-          <div className="rounded-xl bg-white/70 p-2">
+          <div className="rounded-xl bg-[var(--ml-elevated)] p-2">
+            <p className="text-xs ml-muted">Grasa</p>
+            <p className="font-semibold ml-title">
+              {latest.body_fat_pct != null ? `${latest.body_fat_pct}%` : '—'}
+            </p>
+          </div>
+          <div className="rounded-xl bg-[var(--ml-elevated)] p-2">
             <p className="text-xs ml-muted">Cintura</p>
             <p className="font-semibold ml-title">{latest.waist_cm ?? '—'} cm</p>
           </div>
-          <div className="rounded-xl bg-white/70 p-2">
+          <div className="rounded-xl bg-[var(--ml-elevated)] p-2">
             <p className="text-xs ml-muted">Pecho</p>
             <p className="font-semibold ml-title">{latest.chest_cm ?? '—'} cm</p>
           </div>
-          <div className="rounded-xl bg-white/70 p-2">
+          <div className="rounded-xl bg-[var(--ml-elevated)] p-2">
             <p className="text-xs ml-muted">Brazo</p>
             <p className="font-semibold ml-title">{latest.arm_cm ?? '—'} cm</p>
           </div>
@@ -98,12 +107,22 @@ export function BodyMetricsPanel({
         <SimpleBars items={chart} unit="kg" emptyText="Registra tu primer peso" />
       </div>
 
-      <form className="space-y-3 border-t border-[var(--ml-oat)] pt-3" onSubmit={onSubmit}>
+      <form className="space-y-3 border-t border-[var(--ml-border)] pt-3" onSubmit={onSubmit}>
         <p className="text-sm font-medium ml-title">Nueva medición</p>
         <div className="grid grid-cols-2 gap-2">
           <label className="text-xs">
             <span className="mb-1 block ml-muted">Peso kg</span>
             <input className="input-field" inputMode="decimal" value={weightKg} onChange={(e) => setWeightKg(e.target.value)} />
+          </label>
+          <label className="text-xs">
+            <span className="mb-1 block ml-muted">Grasa %</span>
+            <input
+              className="input-field"
+              inputMode="decimal"
+              placeholder="Ej. 18.5"
+              value={bodyFatPct}
+              onChange={(e) => setBodyFatPct(e.target.value)}
+            />
           </label>
           <label className="text-xs">
             <span className="mb-1 block ml-muted">Cintura cm</span>
@@ -124,8 +143,8 @@ export function BodyMetricsPanel({
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
         />
-        {error && <p className="text-sm text-red-600">{error}</p>}
-        {message && <p className="text-sm" style={{ color: 'var(--ml-brick)' }}>{message}</p>}
+        {error && <p className="text-sm text-danger">{error}</p>}
+        {message && <p className="text-sm" style={{ color: 'var(--ml-success)' }}>{message}</p>}
         <button className="btn-primary w-full" type="submit" disabled={saving}>
           {saving ? 'Guardando…' : 'Guardar medidas'}
         </button>

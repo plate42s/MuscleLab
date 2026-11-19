@@ -4,37 +4,33 @@ export default {
   theme: {
     extend: {
       colors: {
-        crimson: {
-          DEFAULT: '#A62C39',
-          brick: '#9B2330',
-          deep: '#70151E',
+        background: '#111315',
+        surface: '#191C20',
+        elevated: '#22272D',
+        border: '#30363D',
+        primary: {
+          DEFAULT: '#F07835',
+          hover: '#E56828',
         },
-        cream: {
-          DEFAULT: '#EDE2D2',
-          oat: '#E3D9C9',
-          sand: '#E6DEC9',
-          mist: '#F4F4F6',
+        content: {
+          DEFAULT: '#F3F4F0',
+          muted: '#A3ABB4',
         },
-        rose: {
-          DEFAULT: '#BC8E8E',
-          soft: '#D4B3B3',
-        },
-        gold: {
-          DEFAULT: '#C4A35A',
-          dark: '#9A7B3C',
-          soft: '#F0E6C8',
-          line: '#D4BC7D',
+        success: '#35B879',
+        warning: '#E3B341',
+        danger: '#E05B5B',
+        info: '#56A6D9',
+        // aliases suaves para migración
+        accent: {
+          DEFAULT: '#F07835',
+          soft: '#22272D',
+          dark: '#E56828',
         },
         ink: {
-          950: '#2A1216',
-          900: '#3B1A1F',
-          800: '#4A2A2F',
-          700: '#5C3A3F',
-        },
-        accent: {
-          DEFAULT: '#A62C39',
-          soft: '#F0E6C8',
-          dark: '#70151E',
+          950: '#111315',
+          900: '#F3F4F0',
+          800: '#F3F4F0',
+          700: '#A3ABB4',
         },
       },
       fontFamily: {
@@ -42,7 +38,7 @@ export default {
         display: ['"Space Grotesk"', 'system-ui', 'sans-serif'],
       },
       boxShadow: {
-        card: '0 10px 30px -18px rgba(112, 21, 30, 0.35)',
+        card: '0 12px 28px -18px rgba(0, 0, 0, 0.55)',
       },
     },
   },

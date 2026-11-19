@@ -25,12 +25,12 @@ export function SimpleBars({
         return (
           <div key={`${item.label}-${item.value}`} className="grid grid-cols-[4.5rem_1fr_auto] items-center gap-2">
             <span className="truncate text-xs ml-muted">{item.label}</span>
-            <div className="h-3 overflow-hidden rounded-full bg-[var(--ml-oat)]">
+            <div className="h-3 overflow-hidden rounded-full bg-[var(--ml-elevated)]">
               <div
                 className="h-full rounded-full"
                 style={{
                   width: `${pct}%`,
-                  background: 'linear-gradient(90deg, var(--ml-crimson), var(--ml-gold))',
+                  background: 'linear-gradient(90deg, var(--ml-primary), var(--ml-primary-hover))',
                 }}
               />
             </div>

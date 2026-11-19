@@ -1,101 +1,192 @@
-import { NavLink, Outlet } from 'react-router-dom'
+import type { ComponentType, SVGProps } from 'react'
+import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import {
+  IconCoach,
+  IconComida,
+  IconEntrenar,
+  IconHoy,
+  IconPerfil,
+  IconProgreso,
+  IconUsuarios,
+} from './NavIcons'
 
-const baseNav = [
-  { to: '/', label: 'Hoy', end: true },
-  { to: '/entrenar', label: 'Entrenar' },
-  { to: '/progreso', label: 'Progreso' },
-  { to: '/comida', label: 'Comida' },
-  { to: '/coach', label: 'Coach' },
-  { to: '/perfil', label: 'Perfil' },
+type NavIcon = ComponentType<SVGProps<SVGSVGElement>>
+type NavItem = { to: string; label: string; end?: boolean; Icon: NavIcon }
+
+const baseNav: NavItem[] = [
+  { to: '/', label: 'Hoy', end: true, Icon: IconHoy },
+  { to: '/entrenar', label: 'Entrenar', Icon: IconEntrenar },
+  { to: '/progreso', label: 'Progreso', Icon: IconProgreso },
+  { to: '/comida', label: 'Comida', Icon: IconComida },
+  { to: '/coach', label: 'Coach', Icon: IconCoach },
+  { to: '/perfil', label: 'Perfil', Icon: IconPerfil },
 ]
+
+/** Bottom bar móvil: 4 acciones principales. Comida/Coach/Usuarios van en Perfil. */
+const mobileNav: NavItem[] = [
+  { to: '/', label: 'Hoy', end: true, Icon: IconHoy },
+  { to: '/entrenar', label: 'Entrenar', Icon: IconEntrenar },
+  { to: '/progreso', label: 'Progreso', Icon: IconProgreso },
+  { to: '/perfil', label: 'Perfil', Icon: IconPerfil },
+]
+
+const sectionMeta: Array<{ match: (path: string) => boolean; title: string; context: string }> = [
+  {
+    match: (p) => p === '/',
+    title: 'Hoy',
+    context: 'Resumen del día · sesiones y racha',
+  },
+  {
+    match: (p) => p.startsWith('/entrenar'),
+    title: 'Entrenar',
+    context: 'Registro de sesión · series y RPE',
+  },
+  {
+    match: (p) => /^\/progreso\/[^/]+/.test(p),
+    title: 'Detalle',
+    context: 'Progreso · historial de entrenamiento',
+  },
+  {
+    match: (p) => p.startsWith('/progreso'),
+    title: 'Progreso',
+    context: 'Historial, volumen y marcas',
+  },
+  {
+    match: (p) => p.startsWith('/comida'),
+    title: 'Comida',
+    context: 'Calorías y macros del día',
+  },
+  {
+    match: (p) => p.startsWith('/coach'),
+    title: 'Coach',
+    context: 'max ia steel · asistencia deportiva',
+  },
+  {
+    match: (p) => p.startsWith('/usuarios'),
+    title: 'Usuarios',
+    context: 'Administración · cuentas y roles',
+  },
+  {
+    match: (p) => p.startsWith('/perfil'),
+    title: 'Perfil',
+    context: 'Cuenta, modalidad y objetivo',
+  },
+]
+
+function resolveSection(pathname: string) {
+  return (
+    sectionMeta.find((s) => s.match(pathname)) ?? {
+      title: 'MuscleLab',
+      context: 'Laboratorio de progreso',
+    }
+  )
+}
 
 export function Layout() {
   const { profile } = useAuth()
+  const location = useLocation()
   const isAdmin = profile?.role === 'admin'
+  const section = resolveSection(location.pathname)
 
-  const navItems = isAdmin
+  const desktopNav = isAdmin
     ? [
         ...baseNav.slice(0, 5),
-        { to: '/usuarios', label: 'Usuarios', end: false },
+        { to: '/usuarios', label: 'Usuarios', Icon: IconUsuarios },
         baseNav[5],
       ]
     : baseNav
 
   return (
-    <div className="ml-shell mx-auto flex min-h-screen w-full max-w-6xl flex-col md:flex-row">
-      <aside className="ml-aside hidden p-6 md:flex md:w-60 md:flex-col md:gap-6">
-        <div>
-          <p className="font-display text-2xl font-bold tracking-tight ml-title">
-            Muscle<span style={{ color: 'var(--ml-gold-dark)' }}>Lab</span>
-          </p>
-          <p className="mt-1 text-xs ml-muted">Laboratorio de progreso</p>
-          <div className="ml-brand-bar mt-3" />
-        </div>
-        <nav className="flex flex-col gap-1.5">
-          {navItems.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.end}
-              className={({ isActive }) =>
-                [
-                  'rounded-xl px-3 py-2.5 text-sm font-semibold transition',
-                  isActive ? 'ml-nav-active' : 'ml-nav-idle',
-                ].join(' ')
-              }
+    <div className="ml-shell min-h-screen p-3 md:p-5">
+      <div className="mx-auto flex min-h-[calc(100vh-1.5rem)] w-full max-w-6xl gap-4 md:min-h-[calc(100vh-2.5rem)] md:gap-5">
+        {/* Desktop sidebar — sin cambios de alcance móvil */}
+        <aside className="ml-aside hidden w-[240px] shrink-0 flex-col gap-5 p-5 md:sticky md:top-5 md:flex md:max-h-[calc(100vh-2.5rem)]">
+          <div>
+            <p className="font-display text-xl font-bold tracking-tight ml-title">
+              Muscle<span style={{ color: 'var(--ml-primary)' }}>Lab</span>
+            </p>
+            <p
+              className="mt-3 text-[11px] font-bold uppercase tracking-[0.18em]"
+              style={{ color: 'var(--ml-primary)' }}
             >
-              {item.label}
-            </NavLink>
-          ))}
-        </nav>
-        <div className="mt-auto rounded-xl border border-[var(--ml-gold-line)] bg-[var(--ml-gold-soft)]/70 p-3">
-          <p className="text-xs font-semibold" style={{ color: 'var(--ml-deep)' }}>
-            Paleta activa
-          </p>
-          <div className="mt-2 flex gap-1.5">
-            <span className="h-3 w-3 rounded-full" style={{ background: 'var(--ml-crimson)' }} />
-            <span className="h-3 w-3 rounded-full" style={{ background: 'var(--ml-gold)' }} />
-            <span className="h-3 w-3 rounded-full" style={{ background: 'var(--ml-rose)' }} />
-            <span className="h-3 w-3 rounded-full" style={{ background: 'var(--ml-oat)' }} />
-            <span className="h-3 w-3 rounded-full" style={{ background: 'var(--ml-deep)' }} />
+              Menu
+            </p>
           </div>
+          <nav className="flex flex-1 flex-col gap-1 overflow-y-auto">
+            {desktopNav.map(({ to, label, end, Icon }) => (
+              <NavLink
+                key={to}
+                to={to}
+                end={end}
+                className={({ isActive }) =>
+                  [
+                    'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition',
+                    isActive ? 'ml-nav-active' : 'ml-nav-idle',
+                  ].join(' ')
+                }
+              >
+                <Icon />
+                <span>{label}</span>
+              </NavLink>
+            ))}
+          </nav>
+        </aside>
+
+        <div className="flex min-w-0 flex-1 flex-col gap-3 pb-[5.5rem] md:gap-4 md:pb-0">
+          {/* Header: en móvil solo logo + título de sección */}
+          <header className="ml-header sticky top-3 z-20 px-3 py-2.5 md:top-5 md:px-5 md:py-3">
+            <div className="flex items-center justify-between gap-3">
+              <p className="font-display text-base font-semibold leading-none ml-title md:hidden">
+                Muscle<span style={{ color: 'var(--ml-primary)' }}>Lab</span>
+              </p>
+
+              <div className="hidden min-w-0 md:block">
+                <p className="truncate text-[11px] font-semibold uppercase tracking-[0.14em] ml-muted">
+                  {section.context}
+                </p>
+                <h1 className="truncate font-display text-xl font-semibold ml-title">
+                  {section.title}
+                </h1>
+              </div>
+
+              <div className="flex shrink-0 items-center gap-2">
+                <h1 className="font-display text-lg font-bold ml-title md:hidden">{section.title}</h1>
+                <span className="hidden text-sm ml-muted md:inline">
+                  {profile?.display_name?.trim() || 'Atleta'}
+                </span>
+                {profile?.role === 'admin' && (
+                  <span className="badge-gold hidden md:inline-flex">admin</span>
+                )}
+              </div>
+            </div>
+          </header>
+
+          <main className="min-w-0 flex-1">
+            <div className="mx-auto w-full max-w-5xl">
+              <Outlet />
+            </div>
+          </main>
         </div>
-      </aside>
-
-      <div className="flex min-h-screen flex-1 flex-col pb-24 md:pb-0">
-        <header className="ml-header px-4 py-4 md:px-8">
-          <p className="font-display text-lg font-semibold ml-title md:hidden">
-            Muscle<span style={{ color: 'var(--ml-gold-dark)' }}>Lab</span>
-          </p>
-          <p className="hidden text-sm md:block ml-muted">
-            Vista detalle · registra en móvil, analiza aquí
-          </p>
-        </header>
-
-        <main className="flex-1 px-4 py-5 md:px-8 md:py-8">
-          <Outlet />
-        </main>
       </div>
 
-      <nav className="ml-bottom-nav fixed inset-x-0 bottom-0 z-20 px-2 py-2 md:hidden">
-        <div
-          className="mx-auto grid max-w-lg gap-1"
-          style={{ gridTemplateColumns: `repeat(${navItems.length}, minmax(0, 1fr))` }}
-        >
-          {navItems.map((item) => (
+      {/* Bottom nav móvil — card flotante como el header */}
+      <nav className="pointer-events-none fixed inset-x-0 bottom-0 z-20 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] md:hidden">
+        <div className="ml-bottom-nav pointer-events-auto mx-auto grid max-w-lg grid-cols-4 gap-1 px-2 py-2">
+          {mobileNav.map(({ to, label, end, Icon }) => (
             <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.end}
+              key={to}
+              to={to}
+              end={end}
               className={({ isActive }) =>
                 [
-                  'rounded-lg px-1 py-2 text-center text-[10px] font-semibold transition sm:text-[11px]',
+                  'flex min-h-[3.25rem] flex-col items-center justify-center gap-1 rounded-xl px-1 py-1.5 text-center text-[11px] font-semibold transition',
                   isActive ? 'ml-nav-mobile-active' : 'ml-nav-idle',
                 ].join(' ')
               }
             >
-              {item.label}
+              <Icon className="h-5 w-5" />
+              <span className="truncate leading-none">{label}</span>
             </NavLink>
           ))}
         </div>
