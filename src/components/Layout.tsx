@@ -1,34 +1,33 @@
-import type { ComponentType, SVGProps } from 'react'
+import type { LucideIcon } from 'lucide-react'
+import {
+  Apple,
+  Dumbbell,
+  LayoutGrid,
+  Sparkles,
+  TrendingUp,
+  User,
+  Users,
+} from 'lucide-react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import {
-  IconCoach,
-  IconComida,
-  IconEntrenar,
-  IconHoy,
-  IconPerfil,
-  IconProgreso,
-  IconUsuarios,
-} from './NavIcons'
 
-type NavIcon = ComponentType<SVGProps<SVGSVGElement>>
-type NavItem = { to: string; label: string; end?: boolean; Icon: NavIcon }
+type NavItem = { to: string; label: string; end?: boolean; Icon: LucideIcon }
 
 const baseNav: NavItem[] = [
-  { to: '/', label: 'Hoy', end: true, Icon: IconHoy },
-  { to: '/entrenar', label: 'Entrenar', Icon: IconEntrenar },
-  { to: '/progreso', label: 'Progreso', Icon: IconProgreso },
-  { to: '/comida', label: 'Comida', Icon: IconComida },
-  { to: '/coach', label: 'Coach', Icon: IconCoach },
-  { to: '/perfil', label: 'Perfil', Icon: IconPerfil },
+  { to: '/', label: 'Hoy', end: true, Icon: LayoutGrid },
+  { to: '/entrenar', label: 'Entrenar', Icon: Dumbbell },
+  { to: '/progreso', label: 'Progreso', Icon: TrendingUp },
+  { to: '/comida', label: 'Comida', Icon: Apple },
+  { to: '/coach', label: 'Coach', Icon: Sparkles },
+  { to: '/perfil', label: 'Perfil', Icon: User },
 ]
 
 /** Bottom bar móvil: 4 acciones principales. Comida/Coach/Usuarios van en Perfil. */
 const mobileNav: NavItem[] = [
-  { to: '/', label: 'Hoy', end: true, Icon: IconHoy },
-  { to: '/entrenar', label: 'Entrenar', Icon: IconEntrenar },
-  { to: '/progreso', label: 'Progreso', Icon: IconProgreso },
-  { to: '/perfil', label: 'Perfil', Icon: IconPerfil },
+  { to: '/', label: 'Hoy', end: true, Icon: LayoutGrid },
+  { to: '/entrenar', label: 'Entrenar', Icon: Dumbbell },
+  { to: '/progreso', label: 'Progreso', Icon: TrendingUp },
+  { to: '/perfil', label: 'Perfil', Icon: User },
 ]
 
 const sectionMeta: Array<{ match: (path: string) => boolean; title: string; context: string }> = [
@@ -92,7 +91,7 @@ export function Layout() {
   const desktopNav: NavItem[] = isAdmin
     ? [
         ...baseNav.slice(0, 5),
-        { to: '/usuarios', label: 'Usuarios', Icon: IconUsuarios },
+        { to: '/usuarios', label: 'Usuarios', Icon: Users },
         baseNav[5],
       ]
     : baseNav
@@ -126,7 +125,7 @@ export function Layout() {
                   ].join(' ')
                 }
               >
-                <Icon />
+                <Icon className="h-4 w-4 shrink-0" strokeWidth={1.8} />
                 <span>{label}</span>
               </NavLink>
             ))}
@@ -170,9 +169,9 @@ export function Layout() {
         </div>
       </div>
 
-      {/* Bottom nav móvil — card flotante como el header */}
-      <nav className="pointer-events-none fixed inset-x-0 bottom-0 z-20 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] md:hidden">
-        <div className="ml-bottom-nav pointer-events-auto mx-auto grid max-w-lg grid-cols-4 gap-1 px-2 py-2">
+      {/* Bottom nav móvil — pill flotante */}
+      <nav className="pointer-events-none fixed inset-x-0 bottom-0 z-20 px-4 pb-[max(0.85rem,env(safe-area-inset-bottom))] md:hidden">
+        <div className="ml-bottom-nav pointer-events-auto mx-auto grid max-w-md grid-cols-4 gap-1 px-2.5 py-2">
           {mobileNav.map(({ to, label, end, Icon }) => (
             <NavLink
               key={to}
@@ -180,12 +179,12 @@ export function Layout() {
               end={end}
               className={({ isActive }) =>
                 [
-                  'flex min-h-[3.25rem] flex-col items-center justify-center gap-1 rounded-xl px-1 py-1.5 text-center text-[11px] font-semibold transition',
+                  'flex min-h-[3.4rem] flex-col items-center justify-center gap-1 rounded-2xl px-1 py-2 text-center text-[11px] font-semibold transition',
                   isActive ? 'ml-nav-mobile-active' : 'ml-nav-idle',
                 ].join(' ')
               }
             >
-              <Icon className="h-5 w-5" />
+              <Icon className="h-5 w-5" strokeWidth={1.8} />
               <span className="truncate leading-none">{label}</span>
             </NavLink>
           ))}

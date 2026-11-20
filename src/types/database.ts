@@ -99,3 +99,40 @@ export interface FoodLog {
   notes: string | null
   created_at: string
 }
+
+export interface RoutineSetTemplate {
+  reps?: string | number | null
+  weight_kg?: string | number | null
+  duration_sec?: string | number | null
+  rpe?: string | number | null
+}
+
+export interface WorkoutRoutine {
+  id: string
+  user_id: string
+  name: string
+  notes: string | null
+  is_favorite: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface WorkoutRoutineItem {
+  id: string
+  routine_id: string
+  exercise_id: string
+  sort_index: number
+  sets: RoutineSetTemplate[]
+}
+
+export interface WorkoutRoutineWithItems extends WorkoutRoutine {
+  items: Array<WorkoutRoutineItem & { exercise: Exercise }>
+}
+
+/** 0=domingo … 6=sábado (Date#getDay) */
+export interface RoutineScheduleEntry {
+  user_id: string
+  weekday: number
+  routine_id: string | null
+  updated_at: string
+}
