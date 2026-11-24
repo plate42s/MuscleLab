@@ -16,7 +16,7 @@ import {
   toggleRoutineFavorite,
   WEEKDAY_LABELS,
 } from '../lib/routines'
-import { supabase } from '../lib/supabase'
+import { saveWorkout, validateWorkoutForSave } from '../lib/saveWorkout'
 import {
   createEmptySet,
   createExerciseDraft,
@@ -326,80 +326,33 @@ export function Train() {
 
   async function finishSession() {
     if (!user) return
-    if (items.length === 0) {
-      setError('Añade al menos un ejercicio')
-      return
-    }
 
-    const setsToSave = items.flatMap((item) =>
-      item.sets.filter((set) => {
-        if (set.completed) return true
-        // Incluye series con datos aunque no estén marcadas
-        return Boolean(set.reps || set.weight_kg || set.duration_sec || set.rpe)
-      }),
-    )
-    if (setsToSave.length === 0) {
-      setError('Completa al menos una serie')
+    const validationError = validateWorkoutForSave(items)
+    if (validationError) {
+      setError(validationError)
       return
     }
 
     setSaving(true)
     setError(null)
 
-    const durationMin = Math.max(1, Math.round(elapsedMs / 60000))
-
-    const { data: workout, error: workoutError } = await supabase
-      .from('workouts')
-      .insert({
-        user_id: user.id,
-        title: title.trim() || `Sesión ${new Date().toLocaleDateString('es-MX')}`,
-        notes: notes.trim() || null,
-        performed_at: new Date().toISOString(),
-        duration_min: durationMin,
-      })
-      .select('*')
-      .single()
-
-    if (workoutError || !workout) {
-      setSaving(false)
-      setError(workoutError?.message ?? 'No se pudo crear la sesión')
-      return
-    }
-
-    const rows = items.flatMap((item) => {
-      const kept = item.sets.filter((set) => {
-        if (set.completed) return true
-        return Boolean(set.reps || set.weight_kg || set.duration_sec || set.rpe)
-      })
-      return kept.map((set, index) => ({
-        workout_id: workout.id,
-        exercise_id: item.exercise.id,
-        set_index: index + 1,
-        reps: set.reps ? Number(set.reps) : null,
-        weight_kg: set.weight_kg ? Number(set.weight_kg) : null,
-        duration_sec: set.duration_sec ? Number(set.duration_sec) : null,
-        rpe: set.rpe ? Number(set.rpe) : null,
-      }))
+    const result = await saveWorkout({
+      userId: user.id,
+      title,
+      notes,
+      items,
+      elapsedMs,
     })
 
-    if (rows.length === 0) {
-      await supabase.from('workouts').delete().eq('id', workout.id)
-      setSaving(false)
-      setError('Completa al menos una serie')
-      return
-    }
-
-    const { error: setsError } = await supabase.from('workout_sets').insert(rows)
     setSaving(false)
 
-    if (setsError) {
-      await supabase.from('workouts').delete().eq('id', workout.id)
-      setError(setsError.message)
+    if (!result.ok) {
+      setError(result.error)
       return
     }
 
     cancelSession()
-    navigate(`/progreso/${workout.id}`)
+    navigate(`/progreso/${result.workoutId}`)
   }
 
   if (!active) {
