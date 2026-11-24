@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ExercisePicker } from '../components/ExercisePicker'
-import { readRestPref, RestTimer, writeRestPref } from '../components/RestTimer'
-import { ExerciseBlock } from '../components/train/ExerciseBlock'
+import { readRestPref, writeRestPref } from '../components/RestTimer'
 import { TrainHome } from '../components/train/TrainHome'
+import { TrainSession } from '../components/train/TrainSession'
 import { useAuth } from '../context/AuthContext'
 import {
   deleteRoutine,
@@ -41,17 +40,6 @@ function readShowClock() {
   }
 }
 
-function formatElapsed(ms: number) {
-  const totalSec = Math.max(0, Math.floor(ms / 1000))
-  const h = Math.floor(totalSec / 3600)
-  const m = Math.floor((totalSec % 3600) / 60)
-  const s = totalSec % 60
-  if (h > 0) {
-    return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
-  }
-  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
-}
-
 export function Train() {
   const { user } = useAuth()
   const navigate = useNavigate()
@@ -73,6 +61,7 @@ export function Train() {
   const [routines, setRoutines] = useState<WorkoutRoutine[]>([])
   const [schedule, setSchedule] = useState<RoutineScheduleEntry[]>([])
   const [routinesLoading, setRoutinesLoading] = useState(false)
+
   const refreshRoutines = useCallback(async () => {
     if (!user) return
     setRoutinesLoading(true)
@@ -86,7 +75,6 @@ export function Train() {
         setSchedule([])
       }
     } catch (err) {
-      // Tabla aún no migrada: no bloqueamos empezar sesión vacía
       setRoutines([])
       setSchedule([])
       if (err instanceof Error && !err.message.includes('workout_routines')) {
@@ -124,7 +112,6 @@ export function Train() {
 
   const elapsedMs = startedAt != null ? now - startedAt : 0
   const sessionName = title.trim() || 'Sesión activa'
-
   const totalSets = useMemo(
     () => items.reduce((acc, item) => acc + item.sets.length, 0),
     [items],
@@ -182,8 +169,7 @@ export function Train() {
         setError('No se encontró la rutina')
         return
       }
-      const draft = routineToDrafts(routine)
-      startSession(draft)
+      startSession(routineToDrafts(routine))
     } catch (err) {
       setError(err instanceof Error ? err.message : 'No se pudo cargar la rutina')
     }
@@ -373,140 +359,44 @@ export function Train() {
   }
 
   return (
-    <div className="mx-auto max-w-xl space-y-3 pb-28 md:space-y-4 md:pb-4">
-      {/* Header sesión + duración */}
-      <div className="ml-stat-card space-y-3">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] ml-muted">
-              Sesión en curso
-            </p>
-            <h2 className="truncate font-display text-xl font-bold ml-title md:text-2xl">
-              {sessionName}
-            </h2>
-            <p className="mt-1 text-sm ml-muted">
-              {items.length} ejercicios · {completedSets}/{totalSets} series
-            </p>
-          </div>
-          <div className="shrink-0 text-right">
-            {showClock ? (
-              <p
-                className="font-display text-2xl font-bold tabular-nums"
-                style={{ color: 'var(--ml-primary)' }}
-              >
-                {formatElapsed(elapsedMs)}
-              </p>
-            ) : (
-              <p className="text-xs font-semibold ml-muted">Reloj oculto</p>
-            )}
-            <button
-              className="mt-1 block w-full text-xs font-semibold ml-muted underline"
-              type="button"
-              onClick={() => setShowClock((v) => !v)}
-            >
-              {showClock ? 'Ocultar reloj' : 'Mostrar reloj'}
-            </button>
-            <button
-              className="mt-1 text-xs font-semibold ml-muted underline"
-              type="button"
-              onClick={cancelSession}
-            >
-              Cancelar
-            </button>
-          </div>
-        </div>
-
-        <input
-          className="input-field min-h-11"
-          placeholder="Nombre de la sesión / rutina"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
-        <textarea
-          className="input-field min-h-16 md:min-h-20"
-          placeholder="Notas de la sesión"
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-        />
-
-        <button
-          className="btn-secondary min-h-11 w-full"
-          type="button"
-          disabled={savingRoutine}
-          onClick={() => void onSaveRoutine()}
-        >
-          {savingRoutine ? 'Guardando rutina…' : 'Guardar rutina'}
-        </button>
-        <p className="text-xs ml-muted">
-          Si el nombre ya existe, se actualiza. Marca ★ en «Mis rutinas» para favoritas.
-        </p>
-        {message && (
-          <p className="text-sm" style={{ color: 'var(--ml-success)' }}>
-            {message}
-          </p>
-        )}
-      </div>
-
-      {items.map((item) => (
-        <ExerciseBlock
-          key={item.localId}
-          item={item}
-          onChangeSet={(setLocalId, field, value) =>
-            updateSet(item.localId, setLocalId, field, value)
-          }
-          onCompleteSet={(setLocalId) => completeSet(item.localId, setLocalId)}
-          onRemoveSet={(setLocalId) => removeSet(item.localId, setLocalId)}
-          onAddSet={() => addSet(item.localId)}
-          onDuplicateSet={() => duplicateSet(item.localId)}
-          onRemoveExercise={() => removeExercise(item.localId)}
-        />
-      ))}
-
-      {error && <p className="text-sm text-danger">{error}</p>}
-
-      <div className="fixed inset-x-0 bottom-[4.75rem] z-10 px-3 md:static md:bottom-auto md:z-auto md:px-0">
-        <div className="mx-auto flex max-w-xl flex-col gap-2">
-          {restEndsAt != null && (
-            <RestTimer
-              endsAt={restEndsAt}
-              totalSec={restSec}
-              label={restLabel}
-              onSkip={skipRest}
-              onChangePreset={(sec) => {
-                writeRestPref(sec)
-                setRestSec(sec)
-                setRestEndsAt(Date.now() + sec * 1000)
-              }}
-            />
-          )}
-          <div className="flex flex-col gap-2 rounded-2xl border border-[var(--ml-border)] bg-[var(--ml-surface)]/95 p-2 shadow-lg backdrop-blur md:border-0 md:bg-transparent md:p-0 md:shadow-none md:backdrop-blur-none">
-            <button
-              className="btn-secondary min-h-11 w-full"
-              type="button"
-              onClick={() => setPickerOpen(true)}
-            >
-              + Añadir ejercicio
-            </button>
-            <button
-              className="btn-primary min-h-12 w-full text-base md:min-h-0 md:text-sm"
-              type="button"
-              disabled={saving}
-              onClick={() => void finishSession()}
-            >
-              {saving ? 'Guardando…' : 'Terminar sesión'}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {user && (
-        <ExercisePicker
-          open={pickerOpen}
-          userId={user.id}
-          onClose={() => setPickerOpen(false)}
-          onSelect={addExercise}
-        />
-      )}
-    </div>
+    <TrainSession
+      userId={user?.id}
+      title={title}
+      notes={notes}
+      items={items}
+      sessionName={sessionName}
+      elapsedMs={elapsedMs}
+      showClock={showClock}
+      totalSets={totalSets}
+      completedSets={completedSets}
+      saving={saving}
+      savingRoutine={savingRoutine}
+      error={error}
+      message={message}
+      pickerOpen={pickerOpen}
+      restEndsAt={restEndsAt}
+      restSec={restSec}
+      restLabel={restLabel}
+      onTitleChange={setTitle}
+      onNotesChange={setNotes}
+      onToggleClock={() => setShowClock((v) => !v)}
+      onCancel={cancelSession}
+      onSaveRoutine={() => void onSaveRoutine()}
+      onChangeSet={updateSet}
+      onCompleteSet={completeSet}
+      onRemoveSet={removeSet}
+      onAddSet={addSet}
+      onDuplicateSet={duplicateSet}
+      onRemoveExercise={removeExercise}
+      onOpenPicker={() => setPickerOpen(true)}
+      onClosePicker={() => setPickerOpen(false)}
+      onSelectExercise={addExercise}
+      onSkipRest={skipRest}
+      onChangeRestPreset={(sec) => {
+        setRestSec(sec)
+        setRestEndsAt(Date.now() + sec * 1000)
+      }}
+      onFinish={() => void finishSession()}
+    />
   )
 }
