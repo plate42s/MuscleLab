@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ExercisePicker } from '../components/ExercisePicker'
 import { readRestPref, RestTimer, writeRestPref } from '../components/RestTimer'
-import { SetRow } from '../components/train/SetRow'
+import { ExerciseBlock } from '../components/train/ExerciseBlock'
 import { WeekRoutineSchedule } from '../components/WeekRoutineSchedule'
 import { useAuth } from '../context/AuthContext'
 import {
@@ -542,83 +542,20 @@ export function Train() {
         )}
       </div>
 
-      {items.map((item) => {
-        const activeSetId =
-          item.sets.find((s) => !s.completed)?.localId ?? item.sets[item.sets.length - 1]?.localId
-
-        return (
-          <div key={item.localId} className="card space-y-3">
-            <div className="flex items-start justify-between gap-2">
-              <div>
-                <h3 className="text-base font-bold ml-title">{item.exercise.name}</h3>
-                <p className="text-xs ml-muted">
-                  {item.exercise.modality} · {item.exercise.load_type}
-                </p>
-              </div>
-              <button
-                className="text-xs font-semibold text-danger"
-                type="button"
-                onClick={() => removeExercise(item.localId)}
-              >
-                Quitar
-              </button>
-            </div>
-
-            {/* Cabecera de filas */}
-            <div
-              className="hidden grid-cols-[2.5rem_1fr_1fr_3.5rem_auto] gap-2 px-1 text-[10px] font-semibold uppercase tracking-[0.12em] ml-muted sm:grid"
-            >
-              <span>Serie</span>
-              <span>{item.exercise.load_type === 'time' ? 'Seg' : 'Reps'}</span>
-              <span>
-                {item.exercise.load_type === 'reps_weight'
-                  ? 'Kg'
-                  : item.exercise.load_type === 'time'
-                    ? '—'
-                    : 'RPE'}
-              </span>
-              <span>RPE</span>
-              <span>Estado</span>
-            </div>
-
-            <div className="space-y-2">
-              {item.sets.map((set) => {
-                const isActive = set.localId === activeSetId && !set.completed
-                return (
-                  <SetRow
-                    key={set.localId}
-                    set={set}
-                    loadType={item.exercise.load_type}
-                    isActive={isActive}
-                    onChange={(field, value) =>
-                      updateSet(item.localId, set.localId, field, value)
-                    }
-                    onComplete={() => completeSet(item.localId, set.localId)}
-                    onRemove={() => removeSet(item.localId, set.localId)}
-                  />
-                )
-              })}
-            </div>
-
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                className="btn-secondary min-h-11 !py-2"
-                type="button"
-                onClick={() => addSet(item.localId)}
-              >
-                + Serie
-              </button>
-              <button
-                className="btn-secondary min-h-11 !py-2"
-                type="button"
-                onClick={() => duplicateSet(item.localId)}
-              >
-                Duplicar última
-              </button>
-            </div>
-          </div>
-        )
-      })}
+      {items.map((item) => (
+        <ExerciseBlock
+          key={item.localId}
+          item={item}
+          onChangeSet={(setLocalId, field, value) =>
+            updateSet(item.localId, setLocalId, field, value)
+          }
+          onCompleteSet={(setLocalId) => completeSet(item.localId, setLocalId)}
+          onRemoveSet={(setLocalId) => removeSet(item.localId, setLocalId)}
+          onAddSet={() => addSet(item.localId)}
+          onDuplicateSet={() => duplicateSet(item.localId)}
+          onRemoveExercise={() => removeExercise(item.localId)}
+        />
+      ))}
 
       {error && <p className="text-sm text-danger">{error}</p>}
 
