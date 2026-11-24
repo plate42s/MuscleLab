@@ -3,14 +3,16 @@ import ws from 'ws'
 
 const AUTH_EMAIL_DOMAIN = 'musclelab.local'
 
+/**
+ * Respuestas JSON same-origin.
+ * Sin headers CORS: el cliente (`adminApi`) llama con `window.location.origin`.
+ * No hay callers cross-origin en el repo; Vite no proxya Functions.
+ */
 function json(statusCode, body) {
   return {
     statusCode,
     headers: {
       'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Headers': 'Authorization, Content-Type',
-      'Access-Control-Allow-Methods': 'GET,POST,PATCH,DELETE,OPTIONS',
     },
     body: JSON.stringify(body),
   }
